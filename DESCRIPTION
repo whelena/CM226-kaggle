@@ -8,8 +8,16 @@ License: What license is it under?
 Depends:
     tidyr,
     dplyr,
-    tidytext
+    readr,
+    tidytext,
+    BoutrosLab.plotting.general
 Imports:
+    tidyr,
+    dplyr,
+    readr,
+    stringr,
+    tidytext,
+    BoutrosLab.plotting.general
 Suggests:
 LazyLoad: yes
 LazyData: yes
