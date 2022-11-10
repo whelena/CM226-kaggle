@@ -1,6 +1,6 @@
 # Project/Repo Title
 
-Template Repository for the Boutros Lab general project repos. Describe a simple overview of use/purpose here.
+https://www.kaggle.com/competitions/msk-redefining-cancer-treatment
 
 ## Description
 
