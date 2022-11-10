@@ -1,6 +1,13 @@
-# Project/Repo Title
+# CM226 Final Project - Personalized Medicine: Redefining Cancer Treatment
 
-https://www.kaggle.com/competitions/msk-redefining-cancer-treatment
+## Data
+Data can be found on: https://www.kaggle.com/competitions/msk-redefining-cancer-treatment/data
+
+training_variants - a comma separated file containing the description of the genetic mutations used for training. Fields are ID (the id of the row used to link the mutation to the clinical evidence), Gene (the gene where this genetic mutation is located), Variation (the aminoacid change for this mutations), Class (1-9 the class this genetic mutation has been classified on)
+training_text - a double pipe (||) delimited file that contains the clinical evidence (text) used to classify genetic mutations. Fields are ID (the id of the row used to link the clinical evidence to the genetic mutation), Text (the clinical evidence used to classify the genetic mutation)
+test_variants - a comma separated file containing the description of the genetic mutations used for training. Fields are ID (the id of the row used to link the mutation to the clinical evidence), Gene (the gene where this genetic mutation is located), Variation (the aminoacid change for this mutations)
+test_text - a double pipe (||) delimited file that contains the clinical evidence (text) used to classify genetic mutations. Fields are ID (the id of the row used to link the clinical evidence to the genetic mutation), Text (the clinical evidence used to classify the genetic mutation)
+submissionSample - a sample submission file in the correct format
 
 ## Description
 
@@ -8,7 +15,7 @@ An in-depth paragraph about your project and overview of use.
 
 ## License
 
-Author: Name1(username1@mednet.ucla.edu), Name2(username2@mednet.ucla.edu)
+Author: Jack Dodson, Terrence Li, Helena Winata
 
 [This project] is licensed under the GNU General Public License version 2. See the file LICENSE.md for the terms of the GNU GPL license.
 
