@@ -1,0 +1,15 @@
+Package: CM226-Kaggle
+Title: What The Package Does (one line, title case required)
+Version: 0.0.1
+Date: 2022-11-11
+Authors: Helena Wwinata, Jack Dodson, Terrence Li
+Description: What the package does (one paragraph)
+License: What license is it under?
+Depends:
+    tidyr,
+    dplyr,
+    tidytext
+Imports:
+Suggests:
+LazyLoad: yes
+LazyData: yes
