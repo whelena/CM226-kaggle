@@ -24,6 +24,9 @@ venv
 # VScode
 .vscode
 
+
+result/*.tsv
 data/*.csv
 data/test*
 data/training*
+

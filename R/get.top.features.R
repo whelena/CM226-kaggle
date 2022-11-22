@@ -3,6 +3,7 @@ get.top.features <- function (df, feature.column, top.n = 20) {
     mat <- spread(df, feat, n);
     mat.freq <- sort(colSums(gene.count.per.class, na.rm = TRUE), decreasing = TRUE);
     df <- df[df$feat %in% names(mat.freq)[1:top.n], ];
+    df[[feature.column]] <- factor(df$feat, levels = names(mat.freq)[1:top.n]);
     df$feat <- NULL;
     return(df);
 }
