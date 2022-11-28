@@ -22,7 +22,7 @@ train.word      <- split.text.to.words(text = train.txt);
 ###################################################################################################
 # load stop words from tidytext and custom file
 data('stop_words');
-custom.stopwords <- data_frame(read.table('data/custom.stopwords.txt', header = TRUE));
+custom.stopwords <- data.frame(read.table('data/custom.stopwords.txt', header = TRUE));
 numbers          <- data.frame(word = as.character(1:100));
 custom.stopwords <- rbind(stop_words[, 'word'], custom.stopwords, numbers);
 train.word       <- remove.words(words = train.word, word.list = custom.stopwords);
@@ -34,13 +34,13 @@ word.frequency   <- table(train.word$word) |> sort(decreasing = TRUE);
 ###################################################################################################
 # extract genes that are in the training and testing set
 train.genes  <- extract.words(words = train.word, word.list = c(train.var$Gene, test.var$Gene));
-train.genes  <- merge(train.var[, c('ID', 'Class')], train.genes, by = 'ID');
+#train.genes  <- merge(train.var[, c('ID', 'Class')], train.genes, by = 'ID');
 IDs.no.genes <- train.var$ID[!train.var$ID %in% unique(train.genes$ID)];
 
 gene.count              <- count(train.genes, word, Class);
 gene.count.per.class    <- spread(gene.count, word, n);
 gene.count.per.class[is.na(gene.count.per.class)] <- 0;
-gene.frequency          <- sort(colSums(gene.count.per.class), decreasing = TRUE);
+# gene.frequency          <- sort(colSums(gene.count.per.class), decreasing = TRUE);
 gene.plot               <- get.top.features(df = gene.count, feature.column = 'word', top.n = 20);
 
 barplot.top.feature(
@@ -55,42 +55,14 @@ barplot.top.feature(
     height = 5,
     width = 10
     );
-save.df(df = gene.count, fname = 'result/train_gene_count.tsv');
+save(train.genes, file = "result/train_genes.rda");
 ###################################################################################################
-# get TF-IDF
+# remove plurals from non genes
 ###################################################################################################
-get.tf.idf <- function(word.df, matrix = FALSE) {
-    # word.df <- train.word[c(1:100, 3375:3385, 6222:6322),]
-    freq <- count(word.df, ID, word);
-    tf.idf <- bind_tf_idf(freq, word, ID, n);
-    if (matrix) {
-        tf.idf.mat <- convert.df2array(
-            DF = tf.idf,
-            value = 'tf_idf',
-            x.axis = 'word',
-            yaxis = 'ID'
-            );
-        return(tf.idf.mat);
-        }
-    return(tf.idf);
-    }
+train.no.genes      <- train.word[train.word$word %in% unique(train.genes$word), ];
+plural.map          <- singularize(unique(train.no.genes$word));
+names(plural.map)   <- unique(train.no.genes$word);
+train.no.genes$word <- plural.map[match(train.no.genes$word, names(plural.map))]
+train.word <- rbind(train.no.genes, train.genes);
 
-tf.idf <- get.tf.idf(train.word);
-save.df(df = tf.idf, fname = 'result/train_tf_idf.tsv');
-
-min.n <- 2;
-tf.idf.mat <- convert.df2array(
-            DF = tf.idf[tf.idf$n > min.n, ],
-            value = 'tf_idf',
-            x.axis = 'word',
-            y.axis = 'ID'
-            );
-save.df(df = tf.idf.mat, fname = paste0('result/train_matrix_tf_idf_min', min.n, '.tsv'));
-
-tf.mat <- convert.df2array(
-            DF = tf.idf[tf.idf$n > min.n, ],
-            value = 'tf',
-            x.axis = 'word',
-            y.axis = 'ID'
-            );
-save.df(df = tf.mat, fname = paste0('result/train_matrix_frequency_min', min.n, '.tsv'));
+save(train.word, file = "result/processed_train_word.rda");

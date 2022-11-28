@@ -10,6 +10,7 @@ Depends:
     dplyr,
     readr,
     tidytext,
+    pluralize,
     BoutrosLab.plotting.general
 Imports:
     tidyr,
