@@ -1,3 +1,6 @@
+library(BoutrosLab.plotting.general)
+library(BoutrosLab.utilities)
+
 barplot.top.feature <- function(df, group, feature.col, fname, ...) {
     df$group.col <- factor(df[[group]], levels = sort(unique(df[[group]])));
 

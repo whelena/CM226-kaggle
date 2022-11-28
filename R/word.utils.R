@@ -1,3 +1,5 @@
+library(tidytext)
+
 split.text.to.words <- function(text) {
     # split text into rows of words
     words <- text %>% select(ID, Text) %>% unnest_tokens(word, Text)

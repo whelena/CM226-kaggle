@@ -66,3 +66,31 @@ train.no.genes$word <- plural.map[match(train.no.genes$word, names(plural.map))]
 train.word <- rbind(train.no.genes, train.genes);
 
 save(train.word, file = "result/processed_train_word.rda");
+
+###################################################################################################
+# PCA
+###################################################################################################
+library(ggfortify)
+library(ggplot2)
+
+# Try selecting 2 or 3 classes that are most dissimilar and see if we can 
+# capture more variance in the PCA.
+
+n <- nrow(tf.idf.mat);
+select_subset_idxs <- runif(n, 1, nrow(tf.idf.mat));
+tf.idf.mat.subset  <- tf.idf.mat[select_subset_idxs,];
+
+tf.idf.pca <- prcomp(tf.idf.mat.subset);
+
+autoplot(tf.idf.pca, data = tf.idf.mat.subset)
+
+var_explained = tf.idf.pca$sdev^2 / sum(tf.idf.pca$sdev^2)
+
+scree_df <- data.frame(pc = c(1:10), var_explained = var_explained[1:10]);
+ggplot(data = scree_df, mapping = aes(x = pc, y = var_explained)) + 
+  geom_point() + 
+  geom_line() +
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot") +
+  ylim(0, 1)
