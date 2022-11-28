@@ -7,9 +7,13 @@ remove.words <- function(words, word.list){
     text.filt <- anti_join(words, word.list, by = 'word');
     }
 
-extract.words  <- function(words, word.list){
+extract.words  <- function(words, word.list, inverse = FALSE){
     word.list <- tolower(unique(word.list));
     word.df   <- data_frame(word = word.list);
-    text.filt <- semi_join(words, word.df, by = 'word');
-    return(unique(text.filt));
+    if (inverse) {
+        text.filt <- words[!words$word %in% word.list, ];
+    } else {
+        text.filt <- words[words$word %in% word.list, ];
+    }
+    return(text.filt);
     }
