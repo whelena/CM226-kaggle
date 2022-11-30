@@ -9,7 +9,7 @@ remove.words <- function(words, word.list){
 
 extract.words  <- function(words, word.list, inverse = FALSE){
     word.list <- tolower(unique(word.list));
-    word.df   <- data_frame(word = word.list);
+    word.df   <- data.frame(word = word.list);
     if (inverse) {
         text.filt <- words[!words$word %in% word.list, ];
     } else {
