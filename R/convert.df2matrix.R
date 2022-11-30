@@ -4,7 +4,7 @@ convert.df2array <- function(DF, value, x.axis = 'word', y.axis = 'ID') {
         stop(paste('Dataframe does not contain one of the columns:', value, x.axis, y.axis));
         };
     arr <- reshape(
-        data = DF[, c(x.axis, y.axis, value)],
+        data = as.data.frame(DF[, c(x.axis, y.axis, value)]),
         v.names = value,
         timevar = y.axis,
         idvar = x.axis,
