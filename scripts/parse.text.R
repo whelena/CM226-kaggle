@@ -55,4 +55,109 @@ barplot.top.feature(
     ylab.label = 'Frequency',
     height = 5,
     width = 10
+<<<<<<< Updated upstream
     )
+=======
+    );
+save(train.genes, file = "result/train_genes.rda");
+###################################################################################################
+# remove plurals from non genes
+###################################################################################################
+train.no.genes      <- train.word[train.word$word %in% unique(train.genes$word), ];
+plural.map          <- singularize(unique(train.no.genes$word));
+names(plural.map)   <- unique(train.no.genes$word);
+train.no.genes$word <- plural.map[match(train.no.genes$word, names(plural.map))]
+train.word <- rbind(train.no.genes, train.genes);
+
+save(train.word, file = "result/processed_train_word.rda");
+
+###################################################################################################
+# PCA
+###################################################################################################
+library(ggfortify)
+library(ggplot2)
+
+# Try selecting 2 or 3 classes that are most dissimilar and see if we can 
+# capture more variance in the PCA.
+
+n <- nrow(tf.idf.mat);
+select_subset_idxs <- runif(n, 1, nrow(tf.idf.mat));
+tf.idf.mat.subset  <- tf.idf.mat[select_subset_idxs,];
+
+tf.idf.pca <- prcomp(tf.idf.mat.subset);
+
+autoplot(tf.idf.pca, data = tf.idf.mat.subset)
+
+var_explained = tf.idf.pca$sdev^2 / sum(tf.idf.pca$sdev^2)
+
+scree_df <- data.frame(pc = c(1:10), var_explained = var_explained[1:10]);
+ggplot(data = scree_df, mapping = aes(x = pc, y = var_explained)) + 
+  geom_point() + 
+  geom_line() +
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot") +
+  ylim(0, 1)
+
+#####################################
+load('training_tf_idf_mat.rda')
+
+rowSums(tf.idf.mat)
+numZeros <- apply(tf.idf.mat, 1, function(x) sum(x == 0) < (0.5 * ncol(tf.idf.mat)));
+keep_idx <- c();
+for(i in 1:length(numZeros)){
+  if(numZeros[i] == TRUE){
+    keep_idx <- c(keep_idx, i);
+  }
+}
+tf.idf.mat.subset <- tf.idf.mat[keep_idx, ];
+
+tf.idf.pca <- prcomp(tf.idf.mat.subset);
+
+autoplot(tf.idf.pca, data = tf.idf.mat.subset)
+
+var_explained = tf.idf.pca$sdev^2 / sum(tf.idf.pca$sdev^2)
+
+scree_df <- data.frame(pc = c(1:5), var_explained = var_explained[1:5]);
+ggplot(data = scree_df, mapping = aes(x = pc, y = var_explained)) + 
+  geom_point() + 
+  geom_line() +
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot") +
+  ylim(0, 1)
+
+load('/Users/jackdodson/Desktop/training_class_tf_idf_mat.rda')
+tf.idf.pca <- prcomp(t(tf.idf.mat));
+autoplot(tf.idf.pca, data = t(tf.idf.mat))
+
+var_explained = tf.idf.pca$sdev^2 / sum(tf.idf.pca$sdev^2)
+
+scree_df <- data.frame(pc = c(1:5), var_explained = var_explained[1:5]);
+ggplot(data = scree_df, mapping = aes(x = pc, y = var_explained)) + 
+  geom_point() + 
+  geom_line() +
+  xlab("Principal Component") + 
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot") +
+  ylim(0, 1)
+
+save(tf.idf.pca, file = '/Users/jackdodson/Desktop/tf.idf.pca.rda')
+
+pc1 <- tf.idf.pca$rotation[,1]
+selected_features <- c(pc1[pc1 > 0])
+
+tf.idf.df <- data.frame(t(tf.idf.mat))
+fit_1 <- lm(cancer ~ ., data = tf.idf.df)
+
+library(dplyr)
+components <- cbind(cancer = tf.idf.df[, "g161v"], tf.idf.pca$x[, 1:2]) %>%
+  as.data.frame()
+
+fit_2 <- lm(cancer ~ ., data = components)
+
+summary(fit_1)$adj.r.squared
+summary(fit_2)$adj.r.squared
+
+tf.idf.pca %>% biplot(cex = .5)
+>>>>>>> Stashed changes
