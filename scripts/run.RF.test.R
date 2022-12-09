@@ -3,40 +3,84 @@
 ###################################################################################################
 devtools::load_all('.');
 
-train.var           <- read.csv('data/training_variants');
-rownames(train.var) <- train.var$ID;
+name            <- 'training_pca_tf_idf';
+result.dir      <- file.path('result', 'RF');
+test.df         <- read.csv(file.path('data', 'test_variants'));
+load(file = file.path(result.dir, paste(name, 'RF.rda', sep = '_')));
+load(file = file.path('result', 'matrix', 'test_tf_idf_mat.rda'));
+common.predictor            <- word.predictor[word.predictor %in% colnames(tf.idf.mat)];
+missing.predictor           <- word.predictor[!word.predictor %in% colnames(tf.idf.mat)];
+test.mat                    <- t(tf.idf.mat[common.predictor, ]);
+missing.predictor.df        <- data.frame(matrix(0, nrow = nrow(test.mat), ncol = length(missing.predictor)));
+names(missing.predictor.df) <- missing.predictor;
+test.mat                    <- cbind(test.mat, missing.predictor.df);
 
-name   <- 'genes_tf_idf'
-load(file = file.path('result', paste(name, '_RF.rda', sep = '_')));
-
-data <- t(tf.idf.mat);
-class <- as.factor(train.var[rownames(data), 'Class']);
-
-# Fit random forest
-mtry <- floor(sqrt(ncol(data)));
-ntree <- 500;
-RF.fit <- randomForest(
-    x           = data,
-    y           = class,
-    importance  = TRUE,          # outputing importance of each predictors
-    nodesize    = 1,             # complexity of each tree - minimum size of terminal nodes, putting it higher than 1 gives incomplete trees
-    ntree       = ntree,         # number of trees that are grown
-    mtry        = mtry,          # number of variables to choose from (default = sqrt of total number)
-    na.action   = na.omit        # drop NA values
+predicted.class <- predict(
+    object = RF.fit,
+    newdata = test.mat,
+    type = 'response'
     );
 
-# plot(RF.fit, type = 'l');
-
-oob.err <- RF.fit$err.rate[nrow(RF.fit$err.rate), 'OOB'];
-conf.plot <- plot.confusion.mat(
-    conf.mat = RF.fit$confusion[, -10],
-    fname = file.path('result', 'plot', paste(name, metric, 'confusion_matrix2.png', sep = '_'))
+prediction.prob <- predict(
+    object = RF.fit,
+    newdata = test.mat,
+    type = 'prob'
     );
-# Remove large, unneeded attributes to reduce model size
-attr(RF.fit$terms, 'factors') <- NULL;
-
-# Add fit and vector of predictor names to output list
-save(
-    RF.fit,
-    file = file.path('result', paste(name, metric, 'RF.rda', sep = '_'))
+write.table(
+    x = prediction.prob,
+    file = file.path(result.dir, 'prediction_probability.tsv'),
+    sep = '\t',
+    col.names = TRUE,
+    row.names = FALSE,
+    quote = FALSE
     );
+bar.df <- as.data.frame(table(predicted.class));
+create.barplot(
+    filename = file.path('result', 'plot', 'test_predicted_class.png'),
+    formula = Freq ~ predicted.class,
+    data = bar.df[bar.df$Freq > 0, ],
+    xaxis.cex = 0.6,
+    xaxis.fontface = 1,
+    xlab.label = 'Class',
+    xlab.cex = 1,
+    ylab.label = 'Frequency',
+    ylab.cex = 1,
+    yaxis.cex = 0.6,
+    yaxis.fontface = 1,
+    height = 2,
+    width = 5
+    );
+
+predicted.df <- data.frame(
+    ID = names(predicted.class),
+    class = factor(predicted.class, levels = 1:9),
+    probability = apply(prediction.prob, 1, max)
+    );
+
+predicted.df <- merge(test.df, predicted.df, by = 'ID', all.x = TRUE);
+write.table(
+    x = predicted.df,
+    file = file.path(result.dir, 'predicted_test.tsv'),
+    sep = '\t',
+    col.names = TRUE,
+    row.names = FALSE,
+    quote = FALSE
+    );
+
+create.boxplot(
+    filename = file.path('result', 'plot', 'test_predicted_boxplot.png'),
+    formula = probability ~ class,
+    data = predicted.df,
+    xaxis.cex = 0.6,
+    xaxis.fontface = 1,
+    xlab.label = 'Class',
+    xlab.cex = 1,
+    ylab.label = 'Prediction probability',
+    ylab.cex = 1,
+    yaxis.cex = 0.6,
+    yaxis.fontface = 1,
+    height = 5,
+    width = 5
+);
+
+

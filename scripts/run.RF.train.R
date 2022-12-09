@@ -6,9 +6,9 @@ devtools::load_all('.');
 train.var           <- read.csv('data/training_variants');
 rownames(train.var) <- train.var$ID;
 
-name   <- 'training'
+name   <- 'training_pca'
 metric <- 'tf_idf' # either tf_idf or frequency
-load(file = file.path('result', paste(name, metric, 'mat.rda', sep = '_')));
+load(file = file.path('result', 'matrix', paste(name, metric, 'mat.rda', sep = '_')));
 
 data <- t(tf.idf.mat);
 class <- as.factor(train.var[rownames(data), 'Class']);
@@ -29,6 +29,7 @@ RF.fit <- randomForest(
 # plot(RF.fit, type = 'l');
 
 oob.err <- RF.fit$err.rate[nrow(RF.fit$err.rate), 'OOB'];
+
 conf.plot <- plot.confusion.mat(
     conf.mat = RF.fit$confusion[, -10],
     colour.scheme = c('white', 'blue'),
@@ -37,8 +38,9 @@ conf.plot <- plot.confusion.mat(
 # Remove large, unneeded attributes to reduce model size
 attr(RF.fit$terms, 'factors') <- NULL;
 
-# Add fit and vector of predictor names to output list
+# Add fit and vector of predictor words to output list
+word.predictor <- colnames(data);
 save(
-    RF.fit,
-    file = file.path('result', paste(name, metric, 'RF.rda', sep = '_'))
+    RF.fit, word.predictor,
+    file = file.path('result', 'RF', paste(name, metric, 'RF.rda', sep = '_'))
     );

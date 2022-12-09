@@ -18,18 +18,17 @@ plot.confusion.mat <- function(
     #     xaxis.lab = rep('', nrow(conf.mat)),
     #     xaxis.tck = 0,
     #     xaxis.cex = 0,
-    #     xaxis.rot = 90,
-    #     resolution = 50
+    #     xaxis.rot = 90
     #     );
     
     # truth.bar <- create.barplot(
-    #     formula = truth ~ class,
+    #     formula = class ~ truth,
     #     data = conf.count,
     #     xaxis.cex = 0,
     #     yaxis.lab = rep('', length(conf.mat)),
     #     yaxis.tck = 0,
     #     yaxis.cex = 0,
-    #     resolution = 50,
+    #     #xlimits = c(- 0.05 * max(conf.count$truth), 1.05 * max(conf.count$truth)),
     #     plot.horizontal = TRUE
     #     );
     
@@ -43,47 +42,46 @@ plot.confusion.mat <- function(
         xaxis.fontface = 1,
         xaxis.rot = 0,
         yaxis.lab = colnames(conf.mat),
-        ylab.label = 'True Labels',
+        ylab.label = 'True Count',
         ylab.cex = 1,
         yaxis.cex = 0.6,
         yaxis.fontface = 1,
         print.colour.key = FALSE,
-        row.pos = which(conf.mat > 0, arr.ind = TRUE)[,2],
-        col.pos = which(conf.mat > 0, arr.ind = TRUE)[,1],
-        cell.text = round(conf.mat[conf.mat > 0], 4),
-        text.cex = 0.6,
-        width = 5,
-        height = 5,
+        # row.pos = which(conf.mat > 0, arr.ind = TRUE)[,2],
+        # col.pos = which(conf.mat > 0, arr.ind = TRUE)[,1],
+        # cell.text = round(conf.mat[conf.mat > 0], 4),
+        # text.cex = 0.6,
         ...
         );
     
     # mp <- create.multiplot(
-    #     plot.objects = list(hm, truth.bar, pred.bar),
+    #     filename = file.path('result', 'plot', 'training_pca_tf_idf_bars.png'),
+    #     plot.objects = list(truth.bar, pred.bar),
     #     plot.layout = c(2, 2),
-    #     layout.skip = c(FALSE, FALSE, FALSE, TRUE),
+    #     layout.skip = c(TRUE, FALSE, FALSE, TRUE),
     #     panel.heights = c(0.3, 1),
-    #     panel.widths = c(1, 0.2),
+    #     panel.widths = c(1, 0.4),
     #     plot.labels.to.retrieve = 1:3,
     #     xlab.label = c('\t', 'Predicted Labels', '\t', '\t', 'Predicted count'),
     #     xlab.cex = 0.7,
-    #     xaxis.tck = 0,
+    #     xaxis.tck = 0.5,
     #     xaxis.cex = 0.6,
     #     xaxis.rot = 0,
     #     xaxis.fontface = 1,
     #     #xlab.to.xaxis.padding = 0.5,
-    #     ylab.label = c( 'True Labels', '\t', '\t', 'True count', '\t'),
-    #     ylab.padding = 13,
+    #     ylab.label = c( 'True Count', '\t', '\t', 'True Labels', '\t'),
+    #     #ylab.padding = 13,
     #     ylab.cex = 0.7,
     #     yaxis.cex = 0.6,
-    #     yaxis.tck = 0,
+    #     yaxis.tck = 0.5,
     #     yaxis.fontface = 1,
     #     # left.padding = 10,
-    #     # x.spacing = c(- 3),
-    #     # y.spacing = c(- 1.5),
+    #     x.spacing = c(0),
+    #     y.spacing = c(- 0.5),
     #     # bottom.padding = 3,
     #     print.new.legend = TRUE,
     #     height = 6,
-    #     width = 6
+    #     width = 6.5
     #     );
     # return(mp);
     }

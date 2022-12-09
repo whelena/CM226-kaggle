@@ -1,20 +1,18 @@
 ###################################################################################################
 # SETUP
 ###################################################################################################
-devtools::load_all('.');
-
 # var1       <- read.csv(file.path('data', 'test_variants'));
 # var2       <- read.csv(file.path('data', 'training_variants'));
 # write.csv(
-#     x = c(var1$Gene, var2$Gene),
+#     x = unique(c(var1$Gene, var2$Gene)),
 #     file = 'data/genes.txt',
 #     row.names = FALSE,
-#     col.names = NA,
 #     quote = FALSE
 #     );
 ###################################################################################################
    
-name <- 'training';
+devtools::load_all('.');
+name <- 'test';
 
 var       <- read.csv(file.path('data', paste0(name, '_variants')));
 txt.dump  <- tibble(text = read_lines(file.path('data', paste0(name, '_text')), skip = 1));
@@ -31,20 +29,19 @@ word.df   <- split.text.to.words(text = txt);
 # load stop words from tidytext and custom file
 data('stop_words');
 custom.stopwords <- data.frame(read.table('data/custom.stopwords.txt', header = TRUE));
-#numbers          <- data.frame(word = as.character(1:100));
-custom.stopwords <- rbind(stop_words[, 'word'], custom.stopwords);
+numbers          <- data.frame(word = as.character(1:9));
+custom.stopwords <- rbind(stop_words[, 'word'], custom.stopwords, numbers);
 word.df          <- remove.words(words = word.df, word.list = custom.stopwords);
 word.df          <- word.df[which(!grepl('^\\d.+$', word.df$word)), ];
 if (name == 'training') {
     word.df          <- merge(var[, c('ID', 'Class')], word.df, by = 'ID');
     }
 word.frequency   <- table(word.df$word) |> sort(decreasing = TRUE);
-
 ###################################################################################################
 # get gene per class frequency
 ###################################################################################################
 # extract genes that are in the training and testing set
-genes.df  <- extract.words(words = word.df, word.list = gene.list$x);
+genes.df  <- extract.words(words = word.df, word.list = tolower(gene.list$x));
 # genes.df  <- merge(var[, c('ID', 'Class')], genes.df, by = 'ID');
 IDs.no.genes <- var$ID[!var$ID %in% unique(genes.df$ID)];
 
@@ -68,14 +65,17 @@ if (name == 'training') {
         width = 10
         );
     }
-save(genes.df, file = file.path('result', paste(name, 'genes.rda', sep = '_')));
+save(genes.df, file = file.path('result', 'parsed.text', paste0(name, '_genes.rda')));
 ###################################################################################################
 # remove plurals from non genes
 ###################################################################################################
-no.genes.df         <- word.df[word.df$word %in% unique(genes.df$word), ];
+no.genes.df         <- word.df[!word.df$word %in% unique(genes.df$word), ];
 plural.map          <- singularize(unique(no.genes.df$word));
 names(plural.map)   <- unique(no.genes.df$word);
 no.genes.df$word    <- plural.map[match(no.genes.df$word, names(plural.map))]
+dim(no.genes.df)
+length(unique(no.genes.df$word)) 
 word.df <- rbind(no.genes.df, genes.df);
-
-save(word.df, file = file.path('result', paste(name, 'words.rda', sep = '_')));
+dim(word.df)
+length(unique(word.df$word)) 
+save(word.df, file = file.path('result', 'parsed.text', paste0(name, '.rda')));
